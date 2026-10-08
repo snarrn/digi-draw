@@ -1,4 +1,6 @@
 # Digi Draw
+___NOTE: This project is in its initial stages of development. Come back later for a more complete version.___
+
 This repository serves as a guide to creating a Digi Draw, which is a small device consisting of a Raspberry Pi Pico, a small display, a couple of sensors, and some 3D-printed parts.
 
 ## Table of Contents
