@@ -30,7 +30,7 @@ The following tasks outline the future development of the project. Completed tas
 * Update the README so it provides an overview of the project
 
 ## Contribution
-This project's software was largely developed by Nathan Snarr. Code usage from Waveshare's demo code will be described.
+This project's software and documentation were developed by Nathan Snarr (code usage from Waveshare will be described). The CAD models were developed by Jacob Snarr. Project collaboration with people outside of Nathan Snarr's personal contacts is likely to be limited. Feel free to fork this repo and add to it (see [LICENSE.md](LICENSE.md)).
 
 ## License
 See [LICENSE.md](LICENSE.md) for details.
