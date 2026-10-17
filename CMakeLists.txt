@@ -48,7 +48,11 @@ pico_enable_stdio_usb(DigiDraw 1)
 
 # Add the standard library to the build
 target_link_libraries(DigiDraw
-        pico_stdlib)
+        pico_stdlib
+        hardware_spi
+        hardware_dma
+        hardware_pwm
+        hardware_gpio)
 
 # Add the standard include files to the build
 target_include_directories(DigiDraw PRIVATE
