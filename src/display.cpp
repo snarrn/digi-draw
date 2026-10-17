@@ -13,7 +13,7 @@ constexpr uint PIN_MOSI = 11;
 constexpr uint PIN_BL   = 13;
 constexpr uint PIN_RST  = 15;
 
-#define LDC_SPI spi1
+#define LCD_SPI spi1
 
 constexpr uint32_t SPI_BAUD = 6'2500'000;
 
