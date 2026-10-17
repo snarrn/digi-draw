@@ -1,4 +1,5 @@
 // This Display class functions as a driver for Waveshare's Pico-ResTouch-LCD-2.8 product.
+// Their products uses an ST7789 control chip, 240x320 resolution, and SPI1 communication interface.
 #pragma once
 #include <cstdint>
 
@@ -23,7 +24,7 @@ public:
     void drawRect(int x, int y, int w, int h, uint16_t color, bool filled=true);
     void drawCircle(int x, int y, int r, uint16_t color, bool filled=true);
     void drawEllipse(int x, int y, int rx, int ry, uint16_t color, bool filled=true);
-    // void drawPolygon();
+    // void drawPolygon(); Implement these functions later
     // void drawText();
 
     // void blit();
