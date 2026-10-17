@@ -177,3 +177,19 @@ Display::Display() {
     sleep_ms(20);
     setBacklightBrightness(255);
 }
+
+void Display::fill(uint16_t color) {
+    // 32 bits at a time, unrolled. Requires 4-byte buffer alignment (alignas(4) in the header).
+    static_assert((WIDTH * HEIGHT) % 8 == 0, "buffer size must be a multiple of 8 pixels");
+    const uint32_t v = (uint32_t(color) << 16) | color;
+    u32_alias* p = reinterpret_cast<u32_alias*>(buffer);
+    u32_alias* const end = p + (WIDTH * HEIGHT) / 2;
+    while (p < end) {
+        p[0] = v; p[1] = v; p[2] = v; p[3] = v;
+        p += 4;
+    }
+}
+
+void Display::fill(uint8_t r, uint8_t g, uint8_t b) {
+    fill(color565(r, g, b));
+}
