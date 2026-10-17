@@ -318,3 +318,96 @@ void Display::drawRect(int x, int y, int w, int h, uint16_t color, bool filled) 
         if (w > 1) vLine(x + w - 1, y + 1, h - 2, color);
     }
 }
+
+void Display::drawCircle(int cx, int cy, int r, uint16_t color, bool filled) {
+    if (r < 0) return;
+    if (r == 0) { drawPixel(cx, cy, color); return; }
+
+    // Midpoint circle: walk one octant, mirror into the other seven.
+    int px = 0, py = r, d = 1 - r;
+    while (px <= py) {
+        if (filled) {
+            // Wide rows at y +/- px
+            hLine(cx - py, cy + px, 2 * py + 1, color);
+            if (px) hLine(cx - py, cy - px, 2 * py + 1, color);
+            // Narrow rows at y +/- py
+            if (px != py) {
+                hLine(cx - px, cy + py, 2 * px + 1, color);
+                hLine(cx - px, cy - py, 2 * px + 1, color);
+            }
+        } else {
+            drawPixel(cx + px, cy + py, color);
+            drawPixel(cx - px, cy + py, color);
+            drawPixel(cx + px, cy - py, color);
+            drawPixel(cx - px, cy - py, color);
+            drawPixel(cx + py, cy + px, color);
+            drawPixel(cx - py, cy + px, color);
+            drawPixel(cx + py, cy - px, color);
+            drawPixel(cx - py, cy - px, color);
+        }
+        ++px;
+        if (d < 0) {
+            d += 2 * px + 1;
+        } else {
+            --py;
+            d += 2 * (px - py) + 1;
+        }
+    }
+}
+
+void Display::drawEllipse(int cx, int cy, int rx, int ry, uint16_t color, bool filled) {
+    if (rx < 0 || ry < 0) return;
+    if (rx == 0 && ry == 0) { drawPixel(cx, cy, color); return; }
+    if (ry == 0) { hLine(cx - rx, cy, 2 * rx + 1, color); return; }
+    if (rx == 0) { vLine(cx, cy - ry, 2 * ry + 1, color); return; }
+
+    auto plot = [&](int x, int y) {
+        if (filled) {
+            hLine(cx - x, cy + y, 2 * x + 1, color);
+            if (y) hLine(cx - x, cy - y, 2 * x + 1, color);
+        } else {
+            drawPixel(cx + x, cy + y, color);
+            drawPixel(cx - x, cy + y, color);
+            if (y) {
+                drawPixel(cx + x, cy - y, color);
+                drawPixel(cx - x, cy - y, color);
+            }
+        }
+    };
+
+    // Midpoint ellipse (64-bit math: rx^2 * ry^2 overflows 32 bits at screen sizes).
+    const int64_t rx2 = int64_t(rx) * rx;
+    const int64_t ry2 = int64_t(ry) * ry;
+    int64_t x = 0, y = ry;
+    int64_t px = 0, py = 2 * rx2 * y;
+
+    // Region 1: slope magnitude < 1, step in x
+    int64_t p = ry2 - rx2 * ry + rx2 / 4;
+    while (px < py) {
+        plot(int(x), int(y));
+        ++x;
+        px += 2 * ry2;
+        if (p < 0) {
+            p += ry2 + px;
+        } else {
+            --y;
+            py -= 2 * rx2;
+            p += ry2 + px - py;
+        }
+    }
+
+    // Region 2: slope magnitude >= 1, step in y
+    p = ry2 * (x * x + x) + ry2 / 4 + rx2 * (y - 1) * (y - 1) - rx2 * ry2;
+    while (y >= 0) {
+        plot(int(x), int(y));
+        --y;
+        py -= 2 * rx2;
+        if (p > 0) {
+            p += rx2 - py;
+        } else {
+            ++x;
+            px += 2 * ry2;
+            p += rx2 - py + px;
+        }
+    }
+}
