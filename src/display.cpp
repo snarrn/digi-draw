@@ -178,6 +178,10 @@ Display::Display() {
     setBacklightBrightness(255);
 }
 
+void Display::setBacklightBrightness(int brightness) {
+    pwm_set_gpio_level(PIN_BL, uint16_t(std::clamp(brightness, 0, 255)));
+}
+
 void Display::fill(uint16_t color) {
     // 32 bits at a time, unrolled. Requires 4-byte buffer alignment (alignas(4) in the header).
     static_assert((WIDTH * HEIGHT) % 8 == 0, "buffer size must be a multiple of 8 pixels");
