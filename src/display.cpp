@@ -411,3 +411,44 @@ void Display::drawEllipse(int cx, int cy, int rx, int ry, uint16_t color, bool f
         }
     }
 }
+
+void Display::drawPolygon(const Point* pts, int count, uint16_t color, bool filled) {
+    if (!pts || count < 1 || count > MAX_POLYGON_VERTICES) return;
+    if (count == 1) { drawPixel(pts[0].x, pts[0].y, color); return; }
+
+    if (filled && count >= 3) {
+        int yMin = pts[0].y, yMax = pts[0].y;
+        for (int i = 1; i < count; ++i) {
+            yMin = std::min(yMin, pts[i].y);
+            yMax = std::max(yMax, pts[i].y);
+        }
+        yMin = std::max(yMin, 0);
+        yMax = std::min(yMax, int(HEIGHT) - 1);
+
+        int xs[MAX_POLYGON_VERTICES];
+        for (int y = yMin; y <= yMax; ++y) {
+            // Collect x crossings of this scanline (even-odd rule)
+            int n = 0;
+            for (int i = 0, j = count - 1; i < count; j = i++) {
+                const int yi = pts[i].y, yj = pts[j].y;
+                if ((yi <= y && yj > y) || (yj <= y && yi > y)) {
+                    xs[n++] = pts[i].x + (y - yi) * (pts[j].x - pts[i].x) / (yj - yi);
+                }
+            }
+            // Insertion sort (n is small)
+            for (int a = 1; a < n; ++a) {
+                int v = xs[a], b = a - 1;
+                while (b >= 0 && xs[b] > v) { xs[b + 1] = xs[b]; --b; }
+                xs[b + 1] = v;
+            }
+            for (int k = 0; k + 1 < n; k += 2) {
+                hLine(xs[k], y, xs[k + 1] - xs[k], color);
+            }
+        }
+        // Fall through: the outline closes the edges the half-open spans leave out.
+    }
+
+    for (int i = 0, j = count - 1; i < count; j = i++) {
+        drawLine(pts[j].x, pts[j].y, pts[i].x, pts[i].y, color);
+    }
+}

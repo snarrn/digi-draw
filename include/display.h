@@ -8,6 +8,13 @@ public:
     static constexpr uint16_t WIDTH = 320;
     static constexpr uint16_t HEIGHT = 240;
 
+    struct Point {
+        int x;
+        int y;
+    };
+
+    static constexpr int MAX_POLYGON_VERTICES = 64; // Max vertices for drawPolygon()
+
     static uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
 
     Display();
@@ -24,12 +31,14 @@ public:
     void drawRect(int x, int y, int w, int h, uint16_t color, bool filled=true);
     void drawCircle(int x, int y, int r, uint16_t color, bool filled=true);
     void drawEllipse(int x, int y, int rx, int ry, uint16_t color, bool filled=true);
-    // void drawPolygon(); Implement these functions later
-    // void drawText();
+    void drawPolygon(const Point* pts, int count, uint16_t color, bool filled);
+    
+    uint16_t getPixel(int x, int y) const;
 
+    // Implement these functions later
+    // void drawText();
     // void blit();
     // void scroll(int x, int y);
-    uint16_t getPixel(int x, int y) const;
 
 private:
     void hLine(int x, int y, int w, uint16_t color);
