@@ -3,6 +3,8 @@
 #include "Display.h"
 #include "pico/stdlib.h"
 
+namespace {
+
 // Pin map for Pico-ResTouch-LCD-2.8
 constexpr uint PIN_DC   =  8;
 constexpr uint PIN_CS   =  9;
@@ -47,5 +49,7 @@ constexpr uint8_t INIT_TABLE[] = {
     0x55, 1, 0xB0,                                  // content adaptive brightness
     0x00
 };
+
+}
 
 Display::Display() { }
