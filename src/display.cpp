@@ -1,9 +1,17 @@
 // This Display class functions as a driver for Waveshare's Pico-ResTouch-LCD-2.8 product.
 // Their product uses an ST7789 control chip, 240x320 resolution, and SPI1 communication interface.
 #include "Display.h"
-#include "pico/stdlib.h"
 
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <utility>
+
+#include "hardware/dma.h"
+#include "hardware/gpio.h"
+#include "hardware/pwm.h"
 #include "hardware/spi.h"
+#include "pico/stdlib.h"
 
 namespace {
 
@@ -105,4 +113,67 @@ uint16_t Display::color565(uint8_t r, uint8_t g, uint8_t b) {
     return uint16_t(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
 }
 
-Display::Display() { }
+Display::Display() {
+    // Keep the backlight off from the very start
+    gpio_init(PIN_BL);
+    gpio_set_dir(PIN_BL, GPIO_OUT);
+    gpio_put(PIN_BL, 0);
+
+    // --- GPIO / SPI ---------------------------------------------------------
+    spi_init(LCD_SPI, SPI_BAUD);
+    gpio_set_function(PIN_CLK,  GPIO_FUNC_SPI);
+    gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
+
+    for (uint pin : {PIN_DC, PIN_CS, PIN_RST}) {
+        gpio_init(pin);
+        gpio_set_dir(pin, GPIO_OUT);
+    }
+    csHigh();
+    gpio_put(PIN_DC, 1);
+
+    // Backlight PWM (stays off until the first frame is on the panel)
+    gpio_set_function(PIN_BL, GPIO_FUNC_PWM);
+    uint slice = pwm_gpio_to_slice_num(PIN_BL);
+    pwm_set_wrap(slice, 255);
+    pwm_set_gpio_level(PIN_BL, 0);
+    pwm_set_enabled(slice, true);
+
+    // --- DMA ----------------------------------------------------------------
+    dmaChannel_ = dma_claim_unused_channel(true);
+    dma_channel_config c = dma_channel_get_default_config(dmaChannel_);
+    channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
+    channel_config_set_dreq(&c, spi_get_dreq(LCD_SPI, true));
+    channel_config_set_read_increment(&c, true);
+    channel_config_set_write_increment(&c, false);
+    dma_channel_configure(dmaChannel_, &c, &spi_get_hw(LCD_SPI)->dr, buffer, 0, false);
+
+    // --- Panel reset + init -------------------------------------------------
+    gpio_put(PIN_RST, 1); sleep_ms(5);
+    gpio_put(PIN_RST, 0); sleep_ms(20);
+    gpio_put(PIN_RST, 1); sleep_ms(120);
+
+    csLow();
+    writeCommand(CMD_SLPOUT);
+    csHigh();
+    sleep_ms(120);
+
+    csLow();
+    for (const uint8_t* p = INIT_TABLE; *p; ) {
+        uint8_t cmd = *p++;
+        uint8_t n   = *p++;
+        writeCommand(cmd, p, n);
+        p += n;
+    }
+    csHigh();                      // display stays off for now
+
+    // Push a black frame while the panel is still off
+    fill(uint16_t(0));
+    update();
+
+    // Now turn the panel on, then the backlight
+    csLow();
+    writeCommand(CMD_DISPON);
+    csHigh();
+    sleep_ms(20);
+    setBacklightBrightness(255);
+}
