@@ -246,3 +246,75 @@ uint16_t Display::getPixel(int x, int y) const {
     if (unsigned(x) < WIDTH && unsigned(y) < HEIGHT) return buffer[y * WIDTH + x];
     return 0;
 }
+
+void Display::hLine(int x, int y, int w, uint16_t color) {
+    if (unsigned(y) >= HEIGHT || w <= 0) return;
+    int x0 = std::max(x, 0);
+    int x1 = std::min(x + w, int(WIDTH));
+    if (x0 >= x1) return;
+    fillSpan(&buffer[y * WIDTH + x0], x1 - x0, color);
+}
+
+void Display::vLine(int x, int y, int h, uint16_t color) {
+    if (unsigned(x) >= WIDTH || h <= 0) return;
+    int y0 = std::max(y, 0);
+    int y1 = std::min(y + h, int(HEIGHT));
+    if (y0 >= y1) return;
+    uint16_t* p = &buffer[y0 * WIDTH + x];
+    for (int row = y0; row < y1; ++row, p += WIDTH) *p = color;
+}
+
+void Display::fillRect(int x, int y, int w, int h, uint16_t color) {
+    if (w <= 0 || h <= 0) return;
+    int x0 = std::max(x, 0);
+    int y0 = std::max(y, 0);
+    int x1 = std::min(x + w, int(WIDTH));
+    int y1 = std::min(y + h, int(HEIGHT));
+    if (x0 >= x1 || y0 >= y1) return;
+    for (int row = y0; row < y1; ++row) {
+        fillSpan(&buffer[row * WIDTH + x0], x1 - x0, color);
+    }
+}
+
+void Display::drawLine(int x0, int y0, int x1, int y1, uint16_t color) {
+    // Fast paths
+    if (y0 == y1) {
+        if (x0 > x1) std::swap(x0, x1);
+        hLine(x0, y0, x1 - x0 + 1, color);
+        return;
+    }
+    if (x0 == x1) {
+        if (y0 > y1) std::swap(y0, y1);
+        vLine(x0, y0, y1 - y0 + 1, color);
+        return;
+    }
+
+    // Bresenham. Skip per-pixel bounds checks when both endpoints are on screen.
+    const bool inside = unsigned(x0) < WIDTH && unsigned(x1) < WIDTH &&
+                        unsigned(y0) < HEIGHT && unsigned(y1) < HEIGHT;
+    const int dx = std::abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+    const int dy = -std::abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+    int err = dx + dy;
+    while (true) {
+        if (inside) buffer[y0 * WIDTH + x0] = color;
+        else        drawPixel(x0, y0, color);
+        if (x0 == x1 && y0 == y1) break;
+        int e2 = 2 * err;
+        if (e2 >= dy) { err += dy; x0 += sx; }
+        if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+}
+
+void Display::drawRect(int x, int y, int w, int h, uint16_t color, bool filled) {
+    if (w <= 0 || h <= 0) return;
+    if (filled) {
+        fillRect(x, y, w, h, color);
+        return;
+    }
+    hLine(x, y, w, color);
+    if (h > 1) hLine(x, y + h - 1, w, color);
+    if (h > 2) {
+        vLine(x, y + 1, h - 2, color);
+        if (w > 1) vLine(x + w - 1, y + 1, h - 2, color);
+    }
+}

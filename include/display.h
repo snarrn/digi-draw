@@ -32,6 +32,10 @@ public:
     uint16_t getPixel(int x, int y) const;
 
 private:
+    void hLine(int x, int y, int w, uint16_t color);
+    void vLine(int x, int y, int h, uint16_t color);
+    void fillRect(int x, int y, int w, int h, uint16_t color);
+
     alignas(4) uint16_t buffer[WIDTH * HEIGHT] = {};
     int dmaChannel_ = -1;
 };
