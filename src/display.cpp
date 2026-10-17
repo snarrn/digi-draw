@@ -23,4 +23,7 @@ constexpr uint8_t CMD_RASET  = 0x2B;
 constexpr uint8_t CMD_RAMWR  = 0x2C;
 constexpr uint8_t CMD_MADCTL = 0x36;
 
+// MADCTL: MX=1, MV=1 -> 320x240 landscape for Waveshare's U2D_R2L
+constexpr uint8_t MADCTL_LANDSCAPE = 0x60;
+
 Display::Display() { }
