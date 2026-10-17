@@ -32,5 +32,6 @@ public:
     // void getPixel(int x, int y) const;
 
 private:
-    uint16_t buffer[WIDTH * HEIGHT] = {};
+    alignas(4) uint16_t buffer[WIDTH * HEIGHT] = {};
+    int dmaChannel_ = -1;
 };
