@@ -37,8 +37,7 @@ pico_sdk_init()
 
 add_executable(DigiDraw
     src/main.cpp
-    src/display.cpp
-    src/colors.cpp)
+    src/display.cpp)
 
 pico_set_program_name(DigiDraw "DigiDraw")
 pico_set_program_version(DigiDraw "0.1")
