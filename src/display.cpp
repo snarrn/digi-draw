@@ -11,4 +11,16 @@ constexpr uint PIN_MOSI = 11;
 constexpr uint PIN_BL   = 13;
 constexpr uint PIN_RST  = 15;
 
+#define LDC_SPI spi1
+
+constexpr uint32_t SPI_BAUD = 6'2500'000;
+
+// ST7789 commands
+constexpr uint8_t CMD_SLPOUT = 0x11;
+constexpr uint8_t CMD_DISPON = 0x29;
+constexpr uint8_t CMD_CASET  = 0x2A;
+constexpr uint8_t CMD_RASET  = 0x2B;
+constexpr uint8_t CMD_RAMWR  = 0x2C;
+constexpr uint8_t CMD_MADCTL = 0x36;
+
 Display::Display() { }
