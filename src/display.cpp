@@ -17,7 +17,7 @@ constexpr uint PIN_RST  = 15;
 
 #define LCD_SPI spi1
 
-constexpr uint32_t SPI_BAUD = 6'2500'000;
+constexpr uint32_t SPI_BAUD = 62'500'000;
 
 // ST7789 commands
 constexpr uint8_t CMD_SLPOUT = 0x11;
