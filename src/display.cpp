@@ -101,4 +101,8 @@ void setWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 
 } // End of empty namespace
 
+uint16_t Display::color565(uint8_t r, uint8_t g, uint8_t b) {
+    return uint16_t(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
+}
+
 Display::Display() { }
