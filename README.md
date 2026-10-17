@@ -13,15 +13,18 @@ This repository serves as a guide to creating a Digi Draw, which is a small devi
 Main features will be described here.
 
 ## Development Roadmap
-The following tasks outline the future development of the project. Completed tasks that involve the creation of features will be moved to the [Features](#features) section.
+The following tasks outline the future development of the project.
 
-* Initial Project Setup
-    * Create project file structure
-    * Input Waveshare's driver files
-    * Configure and test the build
-    * Test flashing the project to the `Pico`
-* Create a wrapper for Waveshare's driver
-* Create a class for getting encoder input
+### ~~Initial Project Setup~~
+* ~~Create project file stucture~~
+* ~~Configure and test build with pico-sdk~~
+* ~~Test flashing the project to the `Pico`~~
+
+### I/O Classes
+* Create a Display class to drive Waveshare's LCD
+* Create an Encoder class for encoder input
+
+### Documentation
 * Reference CAD files for 3D-printed parts
 * Write a full manual that describes the project's
     * Set-up procedure
