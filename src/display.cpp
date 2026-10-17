@@ -237,3 +237,12 @@ void Display::fill(uint16_t color) {
 void Display::fill(uint8_t r, uint8_t g, uint8_t b) {
     fill(color565(r, g, b));
 }
+
+void Display::drawPixel(int x, int y, uint16_t color) {
+    if (unsigned(x) < WIDTH && unsigned(y) < HEIGHT) buffer[y * WIDTH + x] = color;
+}
+
+uint16_t Display::getPixel(int x, int y) const {
+    if (unsigned(x) < WIDTH && unsigned(y) < HEIGHT) return buffer[y * WIDTH + x];
+    return 0;
+}

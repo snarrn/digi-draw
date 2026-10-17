@@ -29,7 +29,7 @@ public:
 
     // void blit();
     // void scroll(int x, int y);
-    // void getPixel(int x, int y) const;
+    uint16_t getPixel(int x, int y) const;
 
 private:
     alignas(4) uint16_t buffer[WIDTH * HEIGHT] = {};
