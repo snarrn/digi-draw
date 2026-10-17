@@ -182,6 +182,46 @@ void Display::setBacklightBrightness(int brightness) {
     pwm_set_gpio_level(PIN_BL, uint16_t(std::clamp(brightness, 0, 255)));
 }
 
+void Display::update() {
+    update(0, 0, WIDTH, HEIGHT);
+}
+
+void Display::update(int x, int y, int w, int h) {
+    // Clip to screen
+    int x1 = std::min(x + w, int(WIDTH));
+    int y1 = std::min(y + h, int(HEIGHT));
+    x = std::max(x, 0);
+    y = std::max(y, 0);
+    if (x >= x1 || y >= y1) return;
+    w = x1 - x;
+    h = y1 - y;
+
+    csLow();
+    setWindow(x, y, x1 - 1, y1 - 1);
+
+    // Pixel data: 16-bit SPI frames send each uint16_t MSB first, which is exactly
+    // the ST7789's RGB565 byte order, so no byte swapping is needed.
+    spi_set_format(LCD_SPI, 16, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+
+    if (w == WIDTH) {
+        // Rows are contiguous in the buffer: one DMA transfer for the whole region.
+        dma_channel_set_trans_count(dmaChannel_, w * h, false);
+        dma_channel_set_read_addr(dmaChannel_, &buffer[y * WIDTH], true);
+        dma_channel_wait_for_finish_blocking(dmaChannel_);
+    } else {
+        // Sub-rectangle: one short DMA transfer per row.
+        for (int row = y; row < y1; ++row) {
+            dma_channel_set_trans_count(dmaChannel_, w, false);
+            dma_channel_set_read_addr(dmaChannel_, &buffer[row * WIDTH + x], true);
+            dma_channel_wait_for_finish_blocking(dmaChannel_);
+        }
+    }
+
+    waitSpiIdle();  // DMA is done once the FIFO is fed; wait for the last bits to shift out
+    csHigh();
+    spi_set_format(LCD_SPI, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
+}
+
 void Display::fill(uint16_t color) {
     // 32 bits at a time, unrolled. Requires 4-byte buffer alignment (alignas(4) in the header).
     static_assert((WIDTH * HEIGHT) % 8 == 0, "buffer size must be a multiple of 8 pixels");
