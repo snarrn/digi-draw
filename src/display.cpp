@@ -3,6 +3,8 @@
 #include "Display.h"
 #include "pico/stdlib.h"
 
+#include "hardware/spi.h"
+
 namespace {
 
 // Pin map for Pico-ResTouch-LCD-2.8
@@ -50,6 +52,53 @@ constexpr uint8_t INIT_TABLE[] = {
     0x00
 };
 
+// 32-bit access to the 16-bit pixel buffer without violating strict aliasing.
+typedef uint32_t __attribute__((may_alias)) u32_alias;
+
+// Fill n pixels with a color using 32-bit stores where possible.
+inline void fillSpan(uint16_t* p, int n, uint16_t c) {
+    if (n <= 0) return;
+    if (reinterpret_cast<uintptr_t>(p) & 2) { *p++ = c; --n; }
+    const uint32_t v = (uint32_t(c) << 16) | c;
+    u32_alias* q = reinterpret_cast<u32_alias*>(p);
+    for (int words = n >> 1; words > 0; --words) *q++ = v;
+    if (n & 1) *reinterpret_cast<uint16_t*>(q) = c;
 }
+
+inline void waitSpiIdle() {
+    while (spi_get_hw(LCD_SPI)->sr & SPI_SSPSR_BSY_BITS) tight_loop_contents();
+}
+
+inline void csLow()  { gpio_put(PIN_CS, 0); }
+inline void csHigh() { gpio_put(PIN_CS, 1); }
+
+// Command/data helpers. All assume SPI is in 8-bit mode and CS is already low.
+inline void writeCommand(uint8_t cmd) {
+    gpio_put(PIN_DC, 0);
+    spi_write_blocking(LCD_SPI, &cmd, 1);
+    waitSpiIdle();                       // DC must not change until the byte has left the shifter
+    gpio_put(PIN_DC, 1);
+}
+
+inline void writeData(const uint8_t* data, size_t len) {
+    spi_write_blocking(LCD_SPI, data, len);
+    waitSpiIdle();
+}
+
+void writeCommand(uint8_t cmd, const uint8_t* args, size_t n) {
+    writeCommand(cmd);
+    if (n) writeData(args, n);
+}
+
+// Inclusive window, then RAMWR. CS must be low, SPI in 8-bit mode.
+void setWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
+    uint8_t col[4] = { uint8_t(x0 >> 8), uint8_t(x0), uint8_t(x1 >> 8), uint8_t(x1) };
+    uint8_t row[4] = { uint8_t(y0 >> 8), uint8_t(y0), uint8_t(y1 >> 8), uint8_t(y1) };
+    writeCommand(CMD_CASET, col, 4);
+    writeCommand(CMD_RASET, row, 4);
+    writeCommand(CMD_RAMWR);
+}
+
+} // End of empty namespace
 
 Display::Display() { }
