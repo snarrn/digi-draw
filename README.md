@@ -24,6 +24,13 @@ The following tasks outline the future development of the project.
 * Create a Display class to drive Waveshare's LCD
 * Create an Encoder class for encoder input
 
+### App Selection
+* Create an `App` base class
+* Create a `DigiDraw` class that
+    * Initializes I/O objects 
+    * Displays an App Select screen with icons
+    * Runs apps when they are selected
+
 ### File System
 * Incorporate a file system for reading/writing files
 
