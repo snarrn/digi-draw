@@ -24,6 +24,9 @@ The following tasks outline the future development of the project.
 * Create a Display class to drive Waveshare's LCD
 * Create an Encoder class for encoder input
 
+### File System
+* Incorporate a file system for reading/writing files
+
 ### Documentation
 * Reference CAD files for 3D-printed parts
 * Write a full manual that describes the project's
