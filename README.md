@@ -43,7 +43,7 @@ The following tasks outline the future development of the project.
 * Update the README so it provides an overview of the project
 
 ## Contribution
-This project's software and documentation were developed by Nathan Snarr. The CAD models were developed by Jacob Snarr. Project collaboration with people outside of Nathan Snarr's personal contacts is likely to be limited. Feel free to fork this repo and add to it (see [LICENSE.md](LICENSE.md)).
+This project's software and documentation were developed by Nathan Snarr with the use of generative AI. The CAD models were developed by Jacob Snarr. Project collaboration with people outside of Nathan Snarr's personal contacts is likely to be limited. Feel free to fork this repo and add to it (see [LICENSE.md](LICENSE.md)).
 
 ## License
 See [LICENSE.md](LICENSE.md) for details.
