@@ -22,6 +22,7 @@ The following tasks outline the future development of the project.
 
 ### I/O Classes
 * Create a Display class to drive Waveshare's LCD
+* Create a font and add Display.text()
 * Create an Encoder class for encoder input
 
 ### App Selection
