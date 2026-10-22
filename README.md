@@ -39,7 +39,7 @@ The following tasks outline the future development of the project.
 * Reference CAD files for 3D-printed parts
 * Write a full manual that describes the project's
     * Set-up procedure
-    * Software
+    * Software (including how to add your own apps)
     * Hardware (including 3D printed parts)
 * Update the README so it provides an overview of the project
 
