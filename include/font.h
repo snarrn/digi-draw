@@ -1,5 +1,6 @@
 // Font struct that describes the basics of a custom font
 // All fonts are drawn monospaced, with every glyph of the same dimensions.
+// The font data consists of bytes describing columns, where bit 0 is the top row.
 #pragma once
 #include <cstdint>
 
