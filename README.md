@@ -13,7 +13,7 @@ This repository serves as a guide to creating a Digi Draw, which is a small devi
 Main features will be described here.
 
 ## Development Roadmap
-The following tasks outline the future development of the project.
+The following tasks outline the development of the project.
 
 ### ~~Initial Project Setup~~
 * ~~Create project file stucture~~
@@ -21,7 +21,7 @@ The following tasks outline the future development of the project.
 * ~~Test flashing the project to the `Pico`~~
 
 ### I/O Classes
-* Create a Display class to drive Waveshare's LCD
+* ~~Create a Display class to drive Waveshare's LCD~~
 * Create a font and add Display.text()
 * Create an Encoder class for encoder input
 
