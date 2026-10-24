@@ -1,4 +1,5 @@
 // Font struct that describes the basics of a custom font
+// All fonts are drawn monospaced, with every glyph of the same dimensions.
 #pragma once
 #include <cstdint>
 
