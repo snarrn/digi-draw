@@ -2,6 +2,7 @@
 // Their product uses an ST7789 control chip, 240x320 resolution, and SPI1 communication interface.
 #include "display.h"
 #include "font.h"
+#include "font_default_5x5.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -13,6 +14,8 @@
 #include "hardware/pwm.h"
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
+
+const Font FONT_DEFAULT_5X5 = {DEFAULT_FONT_5X5, 5, 5, 0, 0, 0};
 
 namespace {
 
@@ -451,5 +454,51 @@ void Display::drawPolygon(const Point* pts, int count, uint16_t color, bool fill
 
     for (int i = 0, j = count - 1; i < count; j = i++) {
         drawLine(pts[j].x, pts[j].y, pts[i].x, pts[i].y, color);
+    }
+}
+
+void Display::drawChar(int x, int y, char ch, uint16_t color, int scale, int32_t bgColor, const Font& font) {
+    const int cellW = font.cellWidth() * scale;
+    const int cellH = font.cellHeight() * scale;
+    if (x >= WIDTH || y >= HEIGHT || x + cellW <= 0 || y + cellH <= 0) return;
+ 
+    if (bgColor >= 0) fillRect(x, y, cellW, cellH, uint16_t(bgColor));
+ 
+    // Characters outside the font's range (including bytes >= 128) use unknownChar.
+    unsigned c = static_cast<unsigned char>(ch);
+    if (c < font.firstChar || c > font.lastChar) c = font.unknownChar;
+    if (c < font.firstChar || c > font.lastChar) return;   // font has no usable fallback
+    const int bpc = font.bytesPerColumn();
+    const uint8_t* glyph = font.data + (c - font.firstChar) * font.bytesPerGlyph();
+ 
+    for (int col = 0; col < font.width; ++col) {
+        const uint8_t* colBytes = glyph + col * bpc;
+        const int px = x + col * scale;
+        if (px >= WIDTH) break;                 // everything further right is off screen
+        int row = 0;
+        while (row < font.height) {
+            if (!((colBytes[row >> 3] >> (row & 7)) & 1)) { ++row; continue; }
+            const int start = row;
+            while (row < font.height && ((colBytes[row >> 3] >> (row & 7)) & 1)) ++row;  // merge vertical runs
+            const int py = y + start * scale;
+            if (scale == 1) {
+                if (row - start == 1) drawPixel(px, py, color);
+                else                  vLine(px, py, row - start, color);
+            } else {
+                fillRect(px, py, scale, (row - start) * scale, color);
+            }
+        }
+    }
+}
+ 
+void Display::drawText(int x, int y, const char* text, uint16_t color, int scale,
+                       int32_t bgColor, const Font& font) {
+    if (!text || scale < 1) return;
+    int cx = x, cy = y;
+    for (const char* s = text; *s; ++s) {
+        if (*s == '\n') { cx = x; cy += font.cellHeight() * scale; continue; }
+        if (*s == '\r') continue;
+        drawChar(cx, cy, *s, color, scale, bgColor, font);
+        cx += font.cellWidth() * scale;
     }
 }

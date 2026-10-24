@@ -2,6 +2,9 @@
 // Their product uses an ST7789 control chip, 240x320 resolution, and SPI1 communication interface.
 #pragma once
 #include <cstdint>
+#include "font.h"
+
+extern const Font FONT_DEFAULT_5X5;
 
 class Display {
 public:
@@ -35,8 +38,10 @@ public:
     
     uint16_t getPixel(int x, int y) const;
 
+    void drawText(int x, int y, const char* text, uint16_t color, int scale=1,
+                  int32_t bgColor=-1, const Font& font=FONT_DEFAULT_5X5);
+
     // Implement these functions later
-    // void drawText();
     // void blit();
     // void scroll(int x, int y);
 
@@ -44,6 +49,7 @@ private:
     void hLine(int x, int y, int w, uint16_t color);
     void vLine(int x, int y, int h, uint16_t color);
     void fillRect(int x, int y, int w, int h, uint16_t color);
+    void drawChar(int x, int y, char c, uint16_t color, int scale, int32_t bgColor, const Font& font);
 
     alignas(4) uint16_t buffer[WIDTH * HEIGHT] = {};
     int dmaChannel_ = -1;
