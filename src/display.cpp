@@ -2,7 +2,6 @@
 // Their product uses an ST7789 control chip, 240x320 resolution, and SPI1 communication interface.
 #include "display.h"
 #include "font.h"
-#include "font_default_5x5.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -14,8 +13,6 @@
 #include "hardware/pwm.h"
 #include "hardware/spi.h"
 #include "pico/stdlib.h"
-
-const Font FONT_DEFAULT_5X5 = {DEFAULT_FONT_5X5, 5, 5, 0, 0, 0};
 
 namespace {
 
