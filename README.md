@@ -44,7 +44,16 @@ The following tasks outline the development of the project.
 * Update the README so it provides an overview of the project
 
 ## Contribution
-This project's software and documentation were developed by Nathan Snarr with the use of generative AI. The CAD models were developed by Jacob Snarr. Project collaboration with people outside of Nathan Snarr's personal contacts is likely to be limited. Feel free to fork this repo and add to it (see [LICENSE.md](LICENSE.md)).
+This project's software and documentation were developed by Nathan Snarr with the use of generative AI. The CAD models were developed by Jacob Snarr. Project collaboration with people outside of Nathan Snarr's personal contacts is likely to be limited.
 
 ## License
-See [LICENSE.md](LICENSE.md) for details.
+This project is licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0). See [LICENSE.txt](LICENSE.txt)
+for details.
+
+The PIXY font data contained in
+[pixy_font_5x5.h](include/pixy_font_5x5.h) is derived from the
+PIXY font by 2DFUNS and is licensed separately under the
+Creative Commons Attribution 3.0 License (CC BY 3.0).
+See [pixy_font_5x5.h](include/pixy_font_5x5.h) and
+[CC-BY-3.0.txt](licenses/CC-BY-3.0.txt) for details.
