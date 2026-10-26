@@ -3,8 +3,9 @@
 #pragma once
 #include <cstdint>
 #include "font.h"
+#include "pixy_font_5x5.h"
 
-extern const Font FONT_DEFAULT_5X5;
+const Font DEFAULT_FONT = PIXY_FONT_5X5;
 
 class Display {
 public:
@@ -39,7 +40,7 @@ public:
     uint16_t getPixel(int x, int y) const;
 
     void drawText(int x, int y, const char* text, uint16_t color, int scale=1,
-                  int32_t bgColor=-1, const Font& font=FONT_DEFAULT_5X5);
+                  int32_t bgColor=-1, const Font& font=DEFAULT_FONT);
 
     // Implement these functions later
     // void blit();
